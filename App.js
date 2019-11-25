@@ -9,6 +9,8 @@ import {
   StatusBar,
   ScrollView,
   Platform,
+  Image,
+  Dimensions
 } from 'react-native'
 import Camera, {
   Aspect,
@@ -16,7 +18,9 @@ import Camera, {
   TorchMode,
   RotateMode,
 } from 'react-native-openalpr'
-import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions'
+import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import ImagePicker from 'react-native-image-picker';
+// import RNTesseractOcr from 'react-native-tesseract-ocr';
 
 const cameraPermission = Platform.select({
   ios: PERMISSIONS.IOS.CAMERA,
@@ -89,6 +93,16 @@ const styles = StyleSheet.create({
   picker: {
     backgroundColor: '#eee',
   },
+  button2 : {
+    backgroundColor: 'orange',
+    borderRadius :300,
+    padding: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  txtButton : {
+
+  }
 })
 
 const MySwitch = ({ title, value, onValueChange }) => (
@@ -133,12 +147,22 @@ const qualityOptions = [
 const countryOptions = [
   { label: 'eu', value: 'eu' },
   { label: 'us', value: 'us' },
+  { label: 'id', value: 'id' },
 ]
+const imagePickerOptions = {
+  title: 'Ambil Photo',
+  storageOptions: {
+    skipBackup: true,
+    path: 'images',
+  },
+};
+
+const dimension = Dimensions.get('window')
 
 export default class App extends Component {
   state = {
     showOptions: false,
-    plate: 'Point at a plate',
+    plate: 'Scan KTP Anda',
     confidence: '',
     error: null,
     showCamera: false,
@@ -152,8 +176,11 @@ export default class App extends Component {
     torchMode: false,
     showPlateOutline: true,
     plateOutlineColor: '#ff0000',
-    country: 'eu',
+    country: 'id',
     touchToFocus: true,
+    avatarSource : '',
+    imageSource: null,
+    text: ''
   }
 
   async componentDidMount() {
@@ -217,6 +244,26 @@ export default class App extends Component {
     })
   }
 
+  selectImage(){
+  }
+  // extractText(imgPath) {
+  //   const lang = 'LANG_INDONESIAN';
+  //   const tessOptions = {
+  //       whitelist : null,
+  //       blacklist : null,
+  //   }
+  //   RNTesseractOcr.recognize(imgPath, lang, tessOptions)
+  //   .then((result) => {
+  //     this.setState({ ocrResult: result });
+  //     console.log("OCR Result: ", result);
+  //   })
+  //   .catch((err) => {
+  //     console.log("OCR Error: ", err);
+  //   })
+  //   .done();
+  // }
+
+
   toggleOptions = () => this.setState({ showOptions: !this.state.showOptions })
 
   render() {
@@ -242,8 +289,8 @@ export default class App extends Component {
           <Camera
             style={styles.camera}
             aspect={aspect}
-            captureQuality={captureQuality}
-            country={country}
+            captureQuality={captureQuality.high}
+            country={'us'}
             onPlateRecognized={this.onPlateRecognized}
             plateOutlineColor={plateOutlineColor}
             showPlateOutline={showPlateOutline}
@@ -260,6 +307,20 @@ export default class App extends Component {
         <Text style={styles.confidenceText}>
           {confidence ? confidence + '%' : ''}
         </Text>
+        <View 
+          style={{ 
+            flex:1, 
+            backgroundColor: 'transparent', 
+            position: 'absolute', 
+            marginVertical : 45,
+            marginHorizontal: 30,
+          }}>
+            <Image 
+              source={require ('./assets/Frame.png')}
+              style={{ width:dimension.width * 0.83, height:dimension.height * 0.85 }}
+              resizeMode ={'contain'}
+            />
+        </View>
         {showOptions && (
           <ScrollView style={styles.options}>
             <MySwitch
@@ -312,6 +373,9 @@ export default class App extends Component {
             />
           </ScrollView>
         )}
+        <TouchableOpacity style={styles.button2} onPress={this.selectImage}>
+          <Text style={{color:'white'}}>Scan KTP</Text>
+        </TouchableOpacity>
       </View>
     )
   }

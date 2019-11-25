@@ -36,6 +36,7 @@ target 'openALPR' do
 
   pod 'react-native-openalpr', :path => '../node_modules/react-native-openalpr'
 
+
   target 'openALPRTests' do
     inherit! :search_paths
     # Pods for testing
